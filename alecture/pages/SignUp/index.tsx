@@ -1,72 +1,43 @@
+import React, { useCallback, useState } from 'react';
 import useInput from '@hooks/useInput';
-import fetcher from '@utils/fetcher';
-import React, { useCallback, useState, VFC } from 'react';
-import axios from 'axios';
-import useSWR from 'swr';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const SignUp = () => {
-  const { data, error, revalidate } = useSWR('/api/users', fetcher);
-
-  const [email, onChangeEmail] = useInput('');
-  const [nickname, onChangeNickname] = useInput('');
-  const [password, , setPassword] = useInput('');
-  const [passwordCheck, , setPasswordCheck] = useInput('');
+  const [email, onChangeEmail, setEmail] = useInput('');
+  const [nickname, onChangeNickname, setNickname] = useInput('');
+  const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
   const [mismatchError, setMismatchError] = useState(false);
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const onChangePassword = useCallback(
-    (e) => {
-      setPassword(e.target.value);
-      setMismatchError(e.target.value !== passwordCheck);
+  const onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      console.log(email, nickname, password, passwordCheck);
+      if (!mismatchError) {
+        console.log('서버로 회원 가입');
+      }
     },
-    [passwordCheck],
+    [email, nickname, password, passwordCheck, mismatchError],
   );
 
   const onChangePasswordCheck = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       setPasswordCheck(e.target.value);
       setMismatchError(e.target.value !== password);
     },
     [password],
   );
 
-  const onSubmit = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (!mismatchError && nickname) {
-        console.log('서버로 회원가입하기');
-        setSignUpError('');
-        setSignUpSuccess(false);
-        axios
-          .post('/api/users', {
-            email,
-            nickname,
-            password,
-          })
-          .then((response) => {
-            console.log(response);
-            setSignUpSuccess(true);
-          })
-          .catch((error) => {
-            console.log(error.response);
-            setSignUpError(error.response.data);
-          })
-          .finally(() => {});
-      }
+  const onChangePassword = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+      setMismatchError(e.target.value !== passwordCheck);
     },
-    [email, nickname, password, passwordCheck, mismatchError],
+    [passwordCheck],
   );
-
-  if (data === undefined) {
-    return <div>로딩중...</div>;
-  }
-
-  if (data) {
-    return <Redirect to="/workspace/sleact/channel/일반" />;
-  }
 
   return (
     <div id="container">
@@ -84,7 +55,7 @@ const SignUp = () => {
             <Input type="text" id="nickname" name="nickname" value={nickname} onChange={onChangeNickname} />
           </div>
         </Label>
-        <Label id="password-label">
+        <Label id="password-label ">
           <span>비밀번호</span>
           <div>
             <Input type="password" id="password" name="password" value={password} onChange={onChangePassword} />

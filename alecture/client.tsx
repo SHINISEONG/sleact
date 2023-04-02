@@ -1,13 +1,15 @@
 import React from 'react';
+import * as ReactDOMClient from 'react-dom/client';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import App from '@layouts/App';
+import App from '@layouts/app';
 
-render(
+const container = document.getElementById('app') as HTMLElement;
+const root = ReactDOMClient.createRoot(container);
+root.render(
   <BrowserRouter>
     <App />
   </BrowserRouter>,
-  document.querySelector('#app'),
 );
 
 // pages - 서비스 페이지
