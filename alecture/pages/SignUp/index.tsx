@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import useInput from '@hooks/useInput';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from './styles';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
   const [email, onChangeEmail, setEmail] = useInput('');
@@ -11,13 +14,31 @@ const SignUp = () => {
   const [mismatchError, setMismatchError] = useState(false);
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
-
+  const { data, error, mutate } = useSWR('/api/users', fetcher, {
+    dedupingInterval: 1000000,
+  });
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       console.log(email, nickname, password, passwordCheck);
       if (!mismatchError) {
         console.log('서버로 회원 가입');
+        setSignUpError('');
+        setSignUpSuccess(true);
+        axios
+          .post('/api/users', {
+            email,
+            nickname,
+            password,
+          })
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+            setSignUpError(error.response.data);
+          })
+          .finally(() => {});
       }
     },
     [email, nickname, password, passwordCheck, mismatchError],
@@ -39,6 +60,13 @@ const SignUp = () => {
     [passwordCheck],
   );
 
+  if (data === undefined) {
+    return <div>로딩중...</div>;
+  }
+
+  if (data) {
+    return <Navigate replace to="/workspace/channel"></Navigate>;
+  }
   return (
     <div id="container">
       <Header>Sleact</Header>
