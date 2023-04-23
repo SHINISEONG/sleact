@@ -3,7 +3,16 @@ import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import { Navigate } from 'react-router';
-import { Channels, Chats, Header, ProfileImg, RightMenu, WorkspaceWrapper } from '@layouts/Workspace/styles';
+import {
+  Channels,
+  Chats,
+  Header,
+  MenuScroll,
+  ProfileImg,
+  RightMenu,
+  WorkspaceName,
+  WorkspaceWrapper,
+} from '@layouts/Workspace/styles';
 import gravatar from 'gravatar';
 type Props = {
   children?: React.ReactNode;
@@ -42,7 +51,8 @@ const Workspace: React.FC<Props> = ({ children }) => {
       <WorkspaceWrapper>
         {/* <Workspace>test</Workspace> */}
         <Channels></Channels>
-
+        <WorkspaceName>Sleact</WorkspaceName>
+        <MenuScroll>menu scroll</MenuScroll>
         <Chats>chat</Chats>
       </WorkspaceWrapper>
       {children}
