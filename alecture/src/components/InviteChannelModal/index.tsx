@@ -26,7 +26,7 @@ const InviteChannelModal: React.FC<Props> = ({
     workspace: string;
     channel: string;
   }>();
-
+  console.log(channel);
   const {
     data: userData,
     error,

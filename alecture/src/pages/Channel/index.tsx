@@ -1,6 +1,9 @@
+import { useParams } from 'react-router';
 import { Container, Header } from './styles';
 
 const Channel = () => {
+  const { channel } = useParams();
+
   return (
     <Container>
       <Header>

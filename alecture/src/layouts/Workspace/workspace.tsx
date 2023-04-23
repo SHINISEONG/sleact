@@ -33,27 +33,39 @@ import { toast } from 'react-toastify';
 import CreateChannelModal from '@components/CreateChannelModal';
 import InviteChannelModal from '@/components/InviteChannelModal';
 import InviteWorkspaceModal from '@/components/InviteWorkspaceModal';
-// type Props = {
-//   children?: React.ReactNode;
-// };
+import ChannelList from '@/components/ChannelList';
+import DMList from '@/components/DMList';
+import ChatBox from '@/components/ChatBox';
+import { ChatArea } from '@/components/ChatBox/styles';
+type Props = {
+  children?: React.ReactNode;
+};
 
-const Workspace = () => {
-  const { workspace } = useParams() as {
+const Workspace: React.FC<Props> = (children) => {
+  const { workspace, channel } = useParams() as {
     workspace: string;
+    channel: string;
   };
 
+  //----------------------------SWR------------------------------------------------
   const {
     data: userData,
     error,
     mutate: userMutate,
   } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher);
-  const { data: channelData, mutate: channelMutate } = useSWR<IChannel[]>(
+  const { data: channelData } = useSWR<IChannel[]>(
     userData
-      ? `http://localhost:3095/api/workspaces/${workspace}/channels`
+      ? `http://localhost:3095/api/workspaces/${workspace}/members`
       : null,
     fetcher
   );
-
+  const { data: memberData } = useSWR<IUser[]>(
+    userData
+      ? `http://localhost:3095/api/workspaces/${workspace}/members`
+      : null,
+    fetcher
+  );
+  //---------------useState------------------------------------------------------------------
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
@@ -134,14 +146,6 @@ const Workspace = () => {
   }, []);
 
   //----------------------로그인 상태에 따른 페이지 전환 -----------------------
-  if (userData === undefined) {
-    return <div>로딩중...</div>;
-  }
-
-  if (channelData === undefined) {
-    return <div>로딩중...</div>;
-  }
-
   if (!userData) {
     return (
       <div id="container">
@@ -149,6 +153,7 @@ const Workspace = () => {
       </div>
     );
   }
+
   return (
     <div>
       <Header>
@@ -188,7 +193,7 @@ const Workspace = () => {
         <Workspaces>
           {userData?.Workspaces.map((ws) => {
             return (
-              <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
+              <Link key={ws.id} to={`/workspace/${ws.url}/channel/일반`}>
                 <WorkspaceButton>
                   {ws.name.slice(0, 1).toLocaleUpperCase()}
                 </WorkspaceButton>
@@ -214,25 +219,15 @@ const Workspace = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((channel) => {
-              return (
-                <Link
-                  key={channel.id}
-                  to={`/workspace/${workspace}/channel/${channel.name}`}
-                >
-                  {channel.name}
-                </Link>
-              );
-            })}
+
+            <ChannelList></ChannelList>
+            <DMList></DMList>
           </MenuScroll>
         </Channels>
         <Chats>
-          chats
           <Routes>
             <Route path="channel" element={<Channel />} />
-            <Route path=":workspace/channel/:channel" element={<Channel />} />
-            <Route path="directmessage" element={<DirectMessage />} />
-            <Route path=":workspace/directmessage/:id" element={<Channel />} />
+            <Route path="dm" element={<DirectMessage />} />
           </Routes>
         </Chats>
       </WorkspaceWrapper>

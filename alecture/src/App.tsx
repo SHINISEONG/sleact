@@ -16,8 +16,12 @@ function App() {
         <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/workspace/*" element={<Workspace />} />
-        <Route path="/workspace/:workspace/*" element={<Workspace />} />
+        <Route
+          path="/workspace/:workspace/channel/:channel/*"
+          element={<Workspace />}
+        />
+        <Route path="/workspace/:workspace/dm/:id/*" element={<Workspace />} />
+        {/* <Route path="/workspace/:workspace/*" element={<Workspace />} /> */}
       </Routes>
     </>
   );
