@@ -1,4 +1,10 @@
-import { FormEvent, FormEventHandler, useCallback, useState } from 'react';
+import {
+  FormEvent,
+  FormEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import useSWR from 'swr';
 import fetcher from '@/utils/fetcher';
 import axios from 'axios';
@@ -37,6 +43,7 @@ import ChannelList from '@/components/ChannelList';
 import DMList from '@/components/DMList';
 import ChatBox from '@/components/ChatBox';
 import { ChatArea } from '@/components/ChatBox/styles';
+import useSocket from '@/hooks/useSocket';
 type Props = {
   children?: React.ReactNode;
 };
@@ -65,6 +72,24 @@ const Workspace: React.FC<Props> = (children) => {
       : null,
     fetcher
   );
+  //---------------useSocket----------------------------------------------------------------
+  const [socket, discconect] = useSocket(workspace);
+  useEffect(() => {
+    if (userData && channelData && socket) {
+      socket?.emit('login', {
+        id: userData.id,
+        channels: channelData.map((channel) => {
+          channel.id;
+        }),
+      });
+    }
+  }, [socket, channelData, userData]);
+
+  useEffect(() => {
+    return () => {
+      discconect();
+    };
+  }, [workspace, discconect]);
   //---------------useState------------------------------------------------------------------
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
@@ -219,7 +244,6 @@ const Workspace: React.FC<Props> = (children) => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-
             <ChannelList></ChannelList>
             <DMList></DMList>
           </MenuScroll>

@@ -13,13 +13,14 @@ import axios from 'axios';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams();
+  console.log(id);
   //----------------------SWR-----------------------------------------
   const {
     data: userData,
     error,
     mutate: userMutate,
   } = useSWR(
-    `http://localhost:3095/api/workspaces/${workspace}/members/${id}`,
+    `http://localhost:3095/api/workspaces/${workspace}/users/${id}`,
     fetcher
   );
 
@@ -40,6 +41,7 @@ const DirectMessage = () => {
   );
   //-----------------hook--------------------------------------
   const [chat, onChangeChat, setChat] = useInput('');
+
   const onSubmitForm = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
@@ -63,9 +65,14 @@ const DirectMessage = () => {
     },
     [chat]
   );
-  if (userData === undefined || myData === undefined) {
+  if (
+    userData === undefined ||
+    myData === undefined ||
+    chatData === undefined
+  ) {
     return <div>'로딩중'</div>;
   }
+  // console.log(userData);
   return (
     <Container>
       <Header>
@@ -75,7 +82,8 @@ const DirectMessage = () => {
         />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList></ChatList>
+      <ChatList chatData={chatData[0]}></ChatList>
+
       <ChatBox
         chat={chat}
         onSubmitForm={onSubmitForm}

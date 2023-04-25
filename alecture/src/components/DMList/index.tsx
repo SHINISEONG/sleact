@@ -23,7 +23,7 @@ const DMList: FC = () => {
       : null,
     fetcher
   );
-  // const [socket] = useSocket(workspace);
+  const [socket] = useSocket(workspace);
   const [channelCollapse, setChannelCollapse] = useState(false);
   const [onlineList, setOnlineList] = useState<number[]>([]);
 
@@ -36,18 +36,18 @@ const DMList: FC = () => {
     setOnlineList([]);
   }, [workspace]);
 
-  // useEffect(() => {
-  //   socket?.on('onlineList', (data: number[]) => {
-  //     setOnlineList(data);
-  //   });
-  //   // socket?.on('dm', onMessage);
-  //   // console.log('socket on dm', socket?.hasListeners('dm'), socket);
-  //   return () => {
-  //     // socket?.off('dm', onMessage);
-  //     // console.log('socket off dm', socket?.hasListeners('dm'));
-  //     socket?.off('onlineList');
-  //   };
-  // }, [socket]);
+  useEffect(() => {
+    socket?.on('onlineList', (data: number[]) => {
+      setOnlineList(data);
+    });
+    // socket?.on('dm', onMessage);
+    // console.log('socket on dm', socket?.hasListeners('dm'), socket);
+    return () => {
+      // socket?.off('dm', onMessage);
+      // console.log('socket off dm', socket?.hasListeners('dm'));
+      socket?.off('onlineList');
+    };
+  }, [socket]);
 
   return (
     <>
@@ -91,6 +91,7 @@ const DMList: FC = () => {
                 />
                 <span>{member.nickname}</span>
                 {member.id === userData?.id && <span> (나)</span>}
+                {isOnline && <span>(온라인)</span>}
               </NavLink>
             );
           })}

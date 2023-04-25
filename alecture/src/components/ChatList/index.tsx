@@ -6,17 +6,30 @@ import React, {
   forwardRef,
   RefObject,
   MutableRefObject,
+  useRef,
+  FC,
 } from 'react';
+import Scrollbars from 'react-custom-scrollbars';
 // import { Scrollbars } from 'react-custom-scrollbars';
+interface Props {
+  chatData: IDM[];
+}
+const defaultProps = {
+  chatData: [],
+};
 
-const ChatList = () => {
+const ChatList: FC<Props> = ({ chatData }) => {
+  const scrollbarRef = useRef(null);
+  const onScroll = useCallback(() => {}, []);
   return (
     <ChatZone>
-      <Section>
-        <section>section</section>
-      </Section>
+      <Scrollbars autoHide ref={scrollbarRef} onScrollFrame={onScroll}>
+        {chatData.map((chat) => (
+          <Chat key={chat.id?.toString()} data={chat} />
+        ))}
+      </Scrollbars>
     </ChatZone>
   );
 };
-
+ChatList.defaultProps = defaultProps;
 export default ChatList;
